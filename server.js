@@ -35,7 +35,7 @@ app.get('/todos/:id', function(req,res) {
 
 	if(matchedTodo)
 		res.json(matchedTodo);
-	else
+	else 	
 		res.status(404).send();
 
 	//res.send('Asking for todo with id of ' + req.params.id)
@@ -43,7 +43,7 @@ app.get('/todos/:id', function(req,res) {
 
 //POST /todos(
 app.post('/todos', function(req, res) {
-	var body = req.body; //use _.pick to only pick description and completed.
+	//var body = req.body; //use _.pick to only pick description and completed.
 	var body = _.pick(req.body, 'description','completed');
 	if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
 		return res.status(400).send();
@@ -62,6 +62,23 @@ app.post('/todos', function(req, res) {
 	//console.log('description: ' + body.description);
 	res.json(body);
 });
+
+//DELETE /todos/:id
+app.delete('/todos/:id', function(req, res) {
+	var idToDelete = parseInt(req.params.id, 10);
+	//console.log('delete: ' + idToDelete);
+	var matchedToDelete = _.findWhere(todos, {id: idToDelete});
+	//console.log('matchedToDelete: ' + matchedToDelete);
+	if(matchedToDelete) {
+		todos = _.without(todos, matchedToDelete);
+		res.json(matchedToDelete);
+	}
+	else
+		res.status(404).json({"error": "no todo found with that id"});
+
+
+});
+
 
 app.listen(PORT, function() {
 	console.log('Express listening on port' + PORT + '!');
