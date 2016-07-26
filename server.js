@@ -81,7 +81,7 @@ app.delete('/todos/:id', function(req, res) {
 
 
 //PUT /todos/:id
-app.put('todos/:id', function(req, res) {
+app.put('/todos/:id', function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
 	var matchedTodo = _.findWhere(todos, {id: todoId});
 	var body = _.pick(req.body, 'description','completed');
@@ -92,7 +92,7 @@ app.put('todos/:id', function(req, res) {
 		return res.status(404).send();
 	}
 	console.log('matchedTodo: ' + matchedTodo);
-	if(body.hasOwnProperty('completed') && _isBoolean(body.completed)) {
+	if(body.hasOwnProperty('completed') && _.isBoolean(body.completed)) {
 		validAttributes.completed = body.completed;
 	} else if(body.hasOwnProperty('completed')) {
 		console.log('completed property is not known');
