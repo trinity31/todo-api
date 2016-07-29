@@ -73,13 +73,23 @@ app.post('/todos', function(req, res) {
 	//	respond with 200 and todo
 	//	res.status(400).json(e);
 
-	/*if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
+
+
+
+	db.todo.create(body).then(function(todo) {
+		res.json(todo.toJSON());
+	}, function(e) {
+		res.status(400).json(e);
+	});
+
+	res.status(200).json(todo);
+/*
+	if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
 		return res.status(400).send();
 	}
 
 	// set body.description to be trimmed value
 	body.description = body.description.trim();
-
 	//ADD id field
 	body.id = todoNextId;
 	todoNextId = todoNextId + 1;
