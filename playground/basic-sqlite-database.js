@@ -43,8 +43,8 @@ sequelize.sync({
 	}).catch(function(e) {
 		console.log(e);
 	});
-	
-	/*;
+
+	/*
 	Todo.create({
 		description: 'Take out trash',
 		//completed: false
