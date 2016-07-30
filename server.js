@@ -18,7 +18,7 @@ app.get('/', function(req, res) {
 app.get('/todos', function(req, res) {
 	var query = req.query;
 	var where = {};
-	
+
 	if(query.hasOwnProperty('completed') && query.completed == 'true') {
 		where.completed = true;
 	} else if(query.hasOwnProperty('completed') && query.completed == 'false') {
@@ -66,8 +66,19 @@ app.post('/todos', function(req, res) {
 
 //DELETE /todos/:id
 app.delete('/todos/:id', function(req, res) {
-	var idToDelete = parseInt(req.params.id, 10);
-	//console.log('delete: ' + idToDelete);
+	var id = parseInt(req.params.id, 10);
+	var where = {};
+	where.id = id;
+
+	db.todo.destroy({where: where}).then(function(todo) {
+		res.json(todo.toJSON());
+	}, function(e) {
+		res.status(404).json( {
+			"error": "no todo found with that id"
+		});
+	});
+
+/*
 	var matchedToDelete = _.findWhere(todos, {
 		id: idToDelete
 	});
@@ -79,8 +90,7 @@ app.delete('/todos/:id', function(req, res) {
 		res.status(404).json({
 			"error": "no todo found with that id"
 		});
-
-
+		*/
 });
 
 
