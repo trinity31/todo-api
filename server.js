@@ -71,13 +71,17 @@ app.delete('/todos/:id', function(req, res) {
 	where.id = id;
 
 	db.todo.destroy({where: where}).then(function(number) {
-		res.status(200).json({
-			"success": number + " items are deleted."
-		});
+		if(number > 0) {
+			res.status(200).json({
+				"success": number + " items are deleted."
+			});
+		} else {
+			res.status(404).json({
+				"fail": "no todo found with that id"
+			});			
+		}
 	}, function(e) {
-		res.status(404).json( {
-			"error": "no todo found with that id"
-		});
+		res.status(500).send();	
 	});
 
 /*
