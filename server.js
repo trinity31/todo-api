@@ -70,8 +70,10 @@ app.delete('/todos/:id', function(req, res) {
 	var where = {};
 	where.id = id;
 
-	db.todo.destroy({where: where}).then(function(todo) {
-		res.json(todo.toJSON());
+	db.todo.destroy({where: where}).then(function(number) {
+		res.status(200).json({
+			"success": number + " items are deleted."
+		});
 	}, function(e) {
 		res.status(404).json( {
 			"error": "no todo found with that id"
