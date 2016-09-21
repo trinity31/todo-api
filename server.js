@@ -100,9 +100,9 @@ app.put('/todos/:id', function(req, res) {
 		attributes.description = body.description;
 	} 
 
-	db.todo.findById(todoId).then(function(todo) {
+	db.todo.findById(todoId).then(function(todo) { //findById -> class method
 		if(todo) {
-			todo.update(attributes).then(function(todo) {
+			todo.update(attributes).then(function(todo) { //todo.update -> instance method
 				res.json(todo.toJSON());
 			}, function(e) {
 				res.status(400).send(e); //Invalid syntax
@@ -119,7 +119,7 @@ app.post('/users', function(req, res) {
 	var body = _.pick(req.body, 'email', 'password');
 
 	db.user.create(body).then(function(user) {
-		res.status(200).json(user.toPublicJSON());
+		res.status(200).json(user.toPublicJSON()); 
 	}, function(e) {
 		res.status(400).json(e);
 	});
@@ -131,13 +131,18 @@ app.post('/users/login', function(req, res) {
 	var body = _.pick(req.body, 'email', 'password');
 
 	db.user.authenticate(body).then(function(user) {
-		res.json(user.toPublicJSON());
+		var token = user.generateToken('authentication');
+		if(token) {
+			res.header('Auth', token).json(user.toPublicJSON());
+		} else {
+			res.status(401).send();
+		}
 	}, function(e) {
 		res.status(401).send();
 	});
 })
 
-db.sequelize.sync({force:true}).then(function() {
+db.sequelize.sync(/*{force:true}*/).then(function() {
 	app.listen(PORT, function() {
 		console.log('Express listening on port' + PORT + '!!');
 	});	
