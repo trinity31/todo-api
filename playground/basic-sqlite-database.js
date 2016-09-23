@@ -17,63 +17,49 @@ var Todo = sequelize.define('todo', {
 		allowNull: false,
 		defaultValue: false
 	}
-})
+});
+
+var User = sequelize.define('user', {
+	email: Sequelize.STRING
+});
+
+Todo.belongsTo(User);
+User.hasMany(Todo);
 
 sequelize.sync({
-	force:true
+	/*force:true*/
 }).then(function() {
 	console.log('Everything is synced');
-
-	Todo.create({
-		description: 'Feed the cat',
+	var where = {
 		completed: true
-	}).then(function(todo) {
-		return Todo.create({
-			description: 'Wash the dishes',
-			completed: true
-		});
-	}).then(function() {
-		return Todo.findById(1);
-	}).then(function(todo) {
-		if(todo){
-			console.log(todo.toJSON());
-		} else {
-			console.log('No todo item found');
-		}
-	}).catch(function(e) {
-		console.log(e);
-	});
+	};
 
-	/*
-	Todo.create({
-		description: 'Take out trash',
-		//completed: false
-	}).then(function(todo) {
-		//console.log('Finished!');
-		//console.log(todo);
-		return Todo.create({
-			description: 'Clean office'
-		});
-	}).then(function() {
-			//return Todo.findById(1);
-			return Todo.findAll({
-				where: {
-					description: {
-						$like: '%Office%'
-					}
-				}
-			});
-	}).then(function(todos) {
-		if(todos) {
+	User.findById(1).then(function(user) {
+		user.getTodos({where: {
+			completed: false
+		}}).then(function(todos) {  //getTodos -> function created automatically
 			todos.forEach(function(todo) {
+
 				console.log(todo.toJSON());
 			});
-			//console.log(todo.toJSON());
-		} else {
-			console.log('No todo found');
-		}
-	}).catch(function(e) {
-		console.log(e);
-	}); */
+
+/*			Todo.findAll({where: where}).then(function(todo) {
+				console.log(todo);;
+			}, function(e) {
+				console.log('None');
+			});*/
+		});
+	});
+/*	User.create({
+			email:"andrew@example.com"
+		}).then(function() {
+			return Todo.create({
+				description: "Clean yard"
+			});
+		}).then(function(todo) {
+			return User.findById(1).then(function(user) {
+				user.addTodo(todo);    //addTodo -> function created automatically
+		});
+	})*/
 });
 
