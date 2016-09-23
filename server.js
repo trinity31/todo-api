@@ -19,7 +19,9 @@ app.get('/', function(req, res) {
 //GET /todos?completed=false&q=work
 app.get('/todos', middleware.requireAuthentication, function(req, res) {
 	var query = req.query;
-	var where = {};
+	var where = {
+		userId: req.user.get('id')
+	};
 
 	if(query.hasOwnProperty('completed') && query.completed == 'true') {
 		where.completed = true;
@@ -43,8 +45,11 @@ app.get('/todos', middleware.requireAuthentication, function(req, res) {
 //GET /todos/:id
 app.get('/todos/:id', middleware.requireAuthentication, function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
-
-	db.todo.findById(todoId).then(function(todo) {
+	var where = {
+		id: todoId,
+		userId: req.user.get('id')
+	};
+	db.todo.findOne({where:where}).then(function(todo) { 
 		if(!!todo) { 
 			res.json(todo.toJSON());
 		} else {
@@ -74,8 +79,9 @@ app.post('/todos', middleware.requireAuthentication, function(req, res) {
 //DELETE /todos/:id
 app.delete('/todos/:id', middleware.requireAuthentication, function(req, res) {
 	var id = parseInt(req.params.id, 10);
-	var where = {};
+	var where = {};  
 	where.id = id;
+	where.userId = req.user.get('id');
 
 	db.todo.destroy({where: where}).then(function(number) {
 		if(number > 0) {
@@ -96,7 +102,10 @@ app.put('/todos/:id', middleware.requireAuthentication, function(req, res) {
 	var todoId = parseInt(req.params.id, 10);
 	var body = _.pick(req.body, 'description', 'completed');
 	var attributes = {};
-
+	var where = {
+		id: todoId,
+		userId: req.user.get('id')
+	};
 
 	if (body.hasOwnProperty('completed')) {
 		attributes.completed = body.completed;
@@ -106,7 +115,7 @@ app.put('/todos/:id', middleware.requireAuthentication, function(req, res) {
 		attributes.description = body.description;
 	} 
 
-	db.todo.findById(todoId).then(function(todo) { //findById -> class method
+	db.todo.findOne({where: where}).then(function(todo) { //findById -> class method    //findOne(where)
 		if(todo) {
 			todo.update(attributes).then(function(todo) { //todo.update -> instance method
 				res.json(todo.toJSON());
